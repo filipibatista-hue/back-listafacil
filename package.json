@@ -4,7 +4,7 @@
   "description": "API Node.js para autenticação e CRUD com PostgreSQL",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon backend/server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
@@ -16,6 +16,6 @@
     "pg": "^8.11.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.14"
   }
 }

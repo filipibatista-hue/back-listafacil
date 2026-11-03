@@ -29,7 +29,7 @@ const autenticarToken = (req, res, next) => {
   });
 };
 
-// Middleware para verificar permissão de Admin
+
 const eAdmin = (req, res, next) => {
   if (req.user?.role !== 'admin' && req.user?.nivel !== 2) {
     return res.status(403).json({ error: 'Acesso restrito a administradores.' });
@@ -37,7 +37,7 @@ const eAdmin = (req, res, next) => {
   next();
 };
 
-// ================= ROTAS DE AUTENTICAÇÃO =================
+
 
 app.post(['/auth/cadastro', '/cadastro'], async (req, res) => {
   const nome = req.body.nome || req.body.email_usuario || req.body.email;
@@ -191,12 +191,14 @@ app.get('/admin/dashboard', autenticarToken, eAdmin, async (req, res) => {
 // ================= ROTAS DO CRUD (LISTAGEM, INSERÇÃO E EDIÇÃO COM STATUS) =================
 
 // 1. Listar tarefas
+// 1. Listar tarefas (Utilizador comum vê as suas + todas as criadas pelo Admin)
 app.get(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) => {
   try {
     const eAdminUser = req.user?.role === 'admin' || req.user?.nivel === 2;
 
     let resultado;
     if (eAdminUser) {
+      // Admin continua a ver tudo
       resultado = await pool.query(
         `SELECT p.id, p.titulo, p.texto, 
                 COALESCE(p.status, 'pendente') AS status, 
@@ -209,16 +211,19 @@ app.get(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) =
          ORDER BY p.id DESC`
       );
     } else {
+      // Utilizador comum vê as DELE + TODAS as criadas pelo Admin (id = 1 ou role = 'admin')
       resultado = await pool.query(
         `SELECT p.id, p.titulo, p.texto, 
                 COALESCE(p.status, 'pendente') AS status, 
                 COALESCE(p.concluida, false) AS concluida,
                 p.usuario_id, p.created_at, 
-                COALESCE(u.nome, 'Utilizador') AS autor_nome, 
+                COALESCE(u.nome, 'Administrador') AS autor_nome, 
                 COALESCE(u.email, '') AS autor_email 
          FROM posts p 
          LEFT JOIN usuarios u ON p.usuario_id = u.id 
          WHERE p.usuario_id = $1 
+            OR u.role = 'admin' 
+            OR p.usuario_id = 1 
          ORDER BY p.id DESC`,
         [req.user.id]
       );
