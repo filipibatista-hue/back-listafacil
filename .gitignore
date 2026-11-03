@@ -1,0 +1,19 @@
+# Dependências do Node.js
+node_modules/
+
+# Variáveis de ambiente (senhas, tokens, etc.)
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+logs/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
