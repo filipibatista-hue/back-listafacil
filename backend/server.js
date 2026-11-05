@@ -166,7 +166,7 @@ app.post(['/auth/login', '/login'], async (req, res) => {
   }
 });
 
-// ================= ROTA EXCLUSIVA DE ADMIN =================
+
 
 app.get('/admin/dashboard', autenticarToken, eAdmin, async (req, res) => {
   try {
@@ -188,17 +188,14 @@ app.get('/admin/dashboard', autenticarToken, eAdmin, async (req, res) => {
   }
 });
 
-// ================= ROTAS DO CRUD (LISTAGEM, INSERÇÃO E EDIÇÃO COM STATUS) =================
 
-// 1. Listar tarefas
-// 1. Listar tarefas (Utilizador comum vê as suas + todas as criadas pelo Admin)
 app.get(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) => {
   try {
     const eAdminUser = req.user?.role === 'admin' || req.user?.nivel === 2;
 
     let resultado;
     if (eAdminUser) {
-      // Admin continua a ver tudo
+     
       resultado = await pool.query(
         `SELECT p.id, p.titulo, p.texto, 
                 COALESCE(p.status, 'pendente') AS status, 
@@ -211,7 +208,7 @@ app.get(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) =
          ORDER BY p.id DESC`
       );
     } else {
-      // Utilizador comum vê as DELE + TODAS as criadas pelo Admin (id = 1 ou role = 'admin')
+
       resultado = await pool.query(
         `SELECT p.id, p.titulo, p.texto, 
                 COALESCE(p.status, 'pendente') AS status, 
@@ -255,7 +252,7 @@ app.get(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) =
   }
 });
 
-// 2. Criar nova tarefa
+
 app.post(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) => {
   const titulo = req.body.titulo || req.body.tarefa || req.body.nome;
   const texto = req.body.texto || req.body.descricao || '';
@@ -283,7 +280,7 @@ app.post(['/posts', '/produtos', '/tarefas'], autenticarToken, async (req, res) 
   }
 });
 
-// 3. Atualizar tarefa existente
+
 app.put(['/posts/:id', '/produtos/:id', '/tarefas/:id'], autenticarToken, async (req, res) => {
   const { id } = req.params;
   const titulo = req.body.titulo || req.body.tarefa || req.body.nome;
@@ -320,7 +317,7 @@ app.put(['/posts/:id', '/produtos/:id', '/tarefas/:id'], autenticarToken, async 
   }
 });
 
-// 4. Excluir tarefa
+
 app.delete(['/posts/:id', '/produtos/:id', '/tarefas/:id'], autenticarToken, async (req, res) => {
   const { id } = req.params;
 
